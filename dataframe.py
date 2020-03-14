@@ -139,7 +139,7 @@ class Categorical(DataType):
                 self.ordered == other.ordered)
 
     def to_string(self):
-        return ("categorical(indices={}, categories={}, ordered=)"
+        return ("categorical(indices={}, categories={}, ordered={})"
                 .format(str(self.index_type), str(self.category_type),
                         self.ordered))
 

@@ -79,7 +79,7 @@ class DictDataFrame(dataframe.DataFrame):
 
         assert len(columns) == len(names)
 
-        self._columns = columns
+        self._columns = columns.copy()
         self._names = list(names)
         # self._name_to_index = {i: k for i, k in enumerate(self._names)}
 
