@@ -97,17 +97,14 @@ class DictDataFrame(dataframe.DataFrame):
     def num_rows(self):
         return self._num_rows
 
-    def iter_column_names(self):
-        return iter(self._names)
-
     @property
     def column_names(self):
         return self._names
 
-    def column_by_name(self, key: Hashable) -> NumPyColumn:
+    def get_column_by_name(self, key: Hashable) -> NumPyColumn:
         return NumPyColumn(key, self._columns[key])
 
-    def column_by_index(self, i: int) -> NumPyColumn:
+    def get_column(self, i: int) -> NumPyColumn:
         return NumPyColumn(self._names[i], self._columns[self._names[i]])
 
 
@@ -124,14 +121,10 @@ def get_example():
 def test_basic_behavior():
     raw_data, names, df = get_example()
 
-    assert len(df) == 5
     assert df.num_columns == 3
     assert df.num_rows == 5
 
     for i, name in enumerate(df.column_names):
-        assert name == names[i]
-
-    for i, name in enumerate(df.iter_column_names()):
         assert name == names[i]
 
     expected_types = {
@@ -141,8 +134,8 @@ def test_basic_behavior():
     }
 
     for i, name in enumerate(names):
-        col = df[name]
+        col = df.get_column(i)
         assert col.name == name
         assert col.type == expected_types[name]
         assert col.to_numpy() is raw_data[name]
-        assert df.column_by_index(i).name == col.name
+        assert df.get_column_by_name(name).name == col.name

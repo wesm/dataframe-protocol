@@ -1,10 +1,6 @@
-# MIT License
-#
-# Copyright (c) 2020 Wes McKinney
-
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, MutableMapping
-from typing import Any, Hashable, Iterable, Sequence
+from collections.abc import Mapping
+from typing import Any, Hashable, Sequence
 
 # ----------------------------------------------------------------------
 # A simple data type class hierarchy for illustration
@@ -163,6 +159,13 @@ class Column(ABC):
         """
         pass
 
+    @property
+    def attrs(self) -> Mapping:
+        """
+        Metadata for this column. Default implementation returns empty dict
+        """
+        return {}
+
     def to_numpy(self):
         """
         Access column's data as a NumPy array. Recommended to return a view if
@@ -182,7 +185,7 @@ class Column(ABC):
 # DataFrame: the main public API
 
 
-class DataFrame(ABC, Mapping):
+class DataFrame(ABC):
     """
     An abstract data frame base class.
 
@@ -197,13 +200,6 @@ class DataFrame(ABC, Mapping):
         Idempotence of data frame protocol
         """
         return self
-
-    def __iter__(self):
-        # TBD: Decide what iterating should return
-        return iter(self.column_names)
-
-    def __len__(self):
-        return self.num_rows
 
     @property
     @abstractmethod
@@ -221,14 +217,6 @@ class DataFrame(ABC, Mapping):
         """
         pass
 
-    @abstractmethod
-    def iter_column_names(self) -> Iterable[Any]:
-        """
-        Return the column names as an iterable
-        """
-        pass
-
-    # TODO: Should this be a method or property?
     @property
     @abstractmethod
     def column_names(self) -> Sequence[Any]:
@@ -237,34 +225,45 @@ class DataFrame(ABC, Mapping):
         """
         pass
 
-    # TODO: Should this be a method or property?
     @property
     def row_names(self) -> Sequence[Any]:
         """
         Return the row names (if any) as a materialized sequence. It is not
         necessary to implement this method
         """
-        raise NotImplementedError("row_names")
-
-    def __getitem__(self, key: Hashable) -> Column:
-        return self.column_by_name(key)
+        raise NotImplementedError("This DataFrame has no row names")
 
     @abstractmethod
-    def column_by_name(self, key: Hashable) -> Column:
-        """
-        Return the column whose name is the indicated key
-        """
-        pass
-
-    @abstractmethod
-    def column_by_index(self, i: int) -> Column:
+    def get_column(self, i: int) -> Column:
         """
         Return the column at the indicated position
         """
         pass
 
+    @abstractmethod
+    def get_column_by_name(self, name: Hashable) -> Column:
+        """
+        Return the column whose name is the indicated name. If the column names
+        are not unique, may raise an exception.
+        """
+        pass
 
-class MutableDataFrame(DataFrame, MutableMapping):
-    # TODO: Mutable data frames are fraught at this interface level and
-    # need more discussion
-    pass
+    def select_columns(self, indices: Sequence[int]):
+        """
+        Create a new DataFrame by selecting a subset of columns by index
+        """
+        raise NotImplementedError("select_columns")
+
+    def select_columns_by_name(self, names: Sequence[Hashable]):
+        """
+        Create a new DataFrame by selecting a subset of columns by name. If the
+        column names are not unique, may raise an exception.
+        """
+        raise NotImplementedError("select_columns_by_name")
+
+    def to_dict_of_numpy(self):
+        """
+        Convert DataFrame to a dict with column names as keys and values the
+        corresponding columns converted to NumPy arrays
+        """
+        raise NotImplementedError("TODO")
