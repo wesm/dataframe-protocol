@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
-from typing import Any, Hashable, Sequence
+from typing import Any, Iterable, Sequence
 
 # ----------------------------------------------------------------------
 # A simple data type class hierarchy for illustration
@@ -148,7 +148,7 @@ class Column(ABC):
 
     @property
     @abstractmethod
-    def name(self) -> Hashable:
+    def name(self) -> Any:
         pass
 
     @property
@@ -190,8 +190,8 @@ class DataFrame(ABC):
     An abstract data frame base class.
 
     A "data frame" represents an ordered collection of named columns. A
-    column's "name" is permitted to be any hashable Python value, but strings
-    are common. Names are not required to be unique. Columns may be accessed by
+    column's "name" is permitted to be any Python value, but strings are
+    common. Names are not required to be unique. Columns may be accessed by
     name (when the name is unique) or by position.
     """
 
@@ -219,7 +219,7 @@ class DataFrame(ABC):
 
     @property
     @abstractmethod
-    def column_names(self) -> Sequence[Any]:
+    def column_names(self) -> Iterable[Any]:
         """
         Return the column names as a materialized sequence
         """
@@ -241,7 +241,7 @@ class DataFrame(ABC):
         pass
 
     @abstractmethod
-    def get_column_by_name(self, name: Hashable) -> Column:
+    def get_column_by_name(self, name: Any) -> Column:
         """
         Return the column whose name is the indicated name. If the column names
         are not unique, may raise an exception.
@@ -254,7 +254,7 @@ class DataFrame(ABC):
         """
         raise NotImplementedError("select_columns")
 
-    def select_columns_by_name(self, names: Sequence[Hashable]):
+    def select_columns_by_name(self, names: Sequence[Any]):
         """
         Create a new DataFrame by selecting a subset of columns by name. If the
         column names are not unique, may raise an exception.
